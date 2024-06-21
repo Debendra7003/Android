@@ -37,7 +37,7 @@ class MessagePage : AppCompatActivity() {
 //    private var scrollView: ScrollView? = null
 
     private lateinit var usernameText: TextInputEditText
-    private lateinit var userNumberText: TextInputEditText
+    private lateinit var userNumber: TextInputEditText
     private lateinit var userState: TextInputEditText
     private lateinit var userDob: TextInputEditText
     private lateinit var userGender: TextInputEditText
@@ -59,7 +59,7 @@ class MessagePage : AppCompatActivity() {
         }
 
 //--------> For Calender to pick a date
-        userDob.setOnClickListener { showDatePickerDialog() }
+//        userDob.setOnClickListener { showDatePickerDialog() }
 
 //--------> Back Arrow to Home page
         val goHome=findViewById<ImageView>(R.id.profileArrow)
@@ -68,35 +68,6 @@ class MessagePage : AppCompatActivity() {
             startActivity(back)
         }
 
-//        rootLayout = findViewById(R.id.profile)
-//        scrollView = findViewById(R.id.scrollViewId)
-//        // Register listener for keyboard visibility changes
-//        rootLayout?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-//            private var keyboardHeightLand = 0
-//            private var keyboardHeightPort = 0
-//            override fun onGlobalLayout() {
-//                val rect = Rect()
-//                rootLayout?.getWindowVisibleDisplayFrame(rect)
-//                val screenHeight = rootLayout?.rootView?.height ?: 0
-//                val keypadHeight = screenHeight - rect.bottom
-//                // Detect keyboard height difference
-//                if (keypadHeight > keyboardHeightLand) {
-//                    keyboardHeightLand = keypadHeight
-//                }
-//                if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT && keypadHeight > keyboardHeightPort) {
-//                    keyboardHeightPort = keypadHeight
-//                }
-//                // Check if keyboard is open based on height difference
-//                val isKeyboardOpen = keypadHeight > screenHeight * 0.50  // Adjust threshold as needed
-//                if (isKeyboardOpen) {
-//                    // Scroll to make sure the focused view is visible
-//                    val focusedView = currentFocus ?: return
-//                    val scrollTo = getScrollY(focusedView)
-//                    val currentScrollView = scrollView // Local immutable copy
-//                    currentScrollView?.smoothScrollTo(0, scrollTo)
-//                }
-//            }
-//        })
 
         val prefs1 = PreferenceManager.getDefaultSharedPreferences(this)
         val token= prefs1.getString("token","")
@@ -104,9 +75,9 @@ class MessagePage : AppCompatActivity() {
         println("token:$token")
 
         usernameText = findViewById(R.id.name_user)
-        userNumberText= findViewById(R.id.number_user)
+        userNumber= findViewById(R.id.num_user)
         userGender= findViewById(R.id.user_gender)
-        userDob= findViewById(R.id.user_dob)
+        userDob= findViewById(R.id.user_birth)
         userState= findViewById(R.id.user_state)
         userPinCode = findViewById(R.id.user_pincode)
         userMaritalStatus = findViewById(R.id.user_marital_status)
@@ -115,18 +86,18 @@ class MessagePage : AppCompatActivity() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val username = prefs.getString("username", "")
-        val birthdate= prefs.getString("birthdate","")
-        val phone= prefs.getString("phone","")
+        val phone_number= prefs.getString("phone_number","")
         val gender= prefs.getString("gender","")
+        val birth= prefs.getString("birthdate","")
         val address= prefs.getString("address","")
         val user_state =prefs.getString("state","")
         val user_pin = prefs.getString("pincode","")
         val mStatus = prefs.getString("marital_status","")
-
+            println("data:  $phone_number    &  $birth")
             usernameText.setText("$username")
-            userNumberText.setText("$phone")
+            userNumber.setText("$phone_number")
             userState.setText("$address")
-            userDob.setText("$birthdate")
+            userDob.setText("$birth")
             userGender.setText("$gender")
             userState.setText("$user_state")
             userPinCode.setText("$user_pin")
@@ -134,7 +105,7 @@ class MessagePage : AppCompatActivity() {
 
         userUpdate.setOnClickListener {
             val name = usernameText.text.toString().trim()
-            val number = userNumberText.text.toString().trim()
+            val number = userNumber.text.toString().trim()
             val user_gender = userGender.text.toString().trim()
             val birth_date = userDob.text.toString().trim()
             val state = userState.text.toString().trim()
@@ -145,7 +116,7 @@ class MessagePage : AppCompatActivity() {
             val id=id.toString()
             when {
                 name.isEmpty()-> usernameText.error = "Enter your Name."
-                number.isEmpty() -> userNumberText.error = "Enter your Number."
+                number.isEmpty() -> userNumber.error = "Enter your Number."
                 user_gender.isEmpty() -> userGender.error = "Enter your Gender."
                 birth_date.isEmpty() -> userDob.error = "Enter your Date of Birth."
                 state.isEmpty() -> userState.error = "Enter your State."
@@ -153,7 +124,7 @@ class MessagePage : AppCompatActivity() {
                 maritalStatus.isEmpty() -> userMaritalStatus.error = "Enter 'Married' or 'Unmarried'."
                 add.isEmpty() -> userAddress.error = "Enter your Address."
                 else -> {
-                    val newData = ProfileUpdateData(id,name,birth_date,number,user_gender,state,pinCode,maritalStatus,add)
+                    val newData = ProfileUpdateData(id,name,number,user_gender,birth_date,state,pinCode,maritalStatus,add)
                     val json = Gson().toJson(newData)
                     sendUpdateData(json, this,user_token)
                 }
@@ -206,12 +177,12 @@ class MessagePage : AppCompatActivity() {
     }
 
     private data class ProfileUpdateData(
-        val id:String,
+        val user_id:String,
         val name:String,
-        val birthdate:String,
-        val phone:String,
+        val phone_number:String,
         val gender:String,
-        val state:String,
+        val birthdate:String,
+        val state :String,
         val pincode:String,
         val marital_status:String,
         val address:String
@@ -225,20 +196,20 @@ class MessagePage : AppCompatActivity() {
 //            view.scrollY + scrollView.scrollY
 //        }
 //    }
-    private fun showDatePickerDialog() {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                // Month is 0 based, so you have to add 1 to display it correctly
-                val dateOfBirth = "$selectedYear/${selectedMonth + 1}/$selectedDay"
-                userDob.setText(dateOfBirth)
-            },
-            year, month, day
-        )
-        datePickerDialog.show()
-    }
+//    private fun showDatePickerDialog() {
+//        val calendar = Calendar.getInstance()
+//        val year = calendar.get(Calendar.YEAR)
+//        val month = calendar.get(Calendar.MONTH)
+//        val day = calendar.get(Calendar.DAY_OF_MONTH)
+//
+//        val datePickerDialog = DatePickerDialog(this,
+//            { _, selectedYear, selectedMonth, selectedDay ->
+//                // Month is 0 based, so you have to add 1 to display it correctly
+//                val dateOfBirth = "$selectedYear/${selectedMonth + 1}/$selectedDay"
+//                userDob.setText(dateOfBirth)
+//            },
+//            year, month, day
+//        )
+//        datePickerDialog.show()
+//    }
 }

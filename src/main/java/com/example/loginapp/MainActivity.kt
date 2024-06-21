@@ -131,8 +131,7 @@ class MainActivity : AppCompatActivity() {
         val refresh: String,
         val access:String,
         val name: String,
-        val user_id:String,
-
+        val user_id:String
     )
     // ----------------> The response data converting JSON to string
     private fun storeUsername(name: String) {

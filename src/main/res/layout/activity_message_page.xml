@@ -118,7 +118,7 @@
                 app:boxStrokeWidthFocused="0dp">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/number_user"
+                    android:id="@+id/num_user"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="#FF5722"
@@ -131,7 +131,7 @@
                     android:id="@+id/user_number_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@id/number_user"
+                    android:layout_below="@id/num_user"
                     android:background="#2E3FA6" />
             </com.google.android.material.textfield.TextInputLayout>
             <!--This layout for Phone number field end-->
@@ -182,7 +182,7 @@
                 app:boxStrokeWidthFocused="0dp">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/user_dob"
+                    android:id="@+id/user_birth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="#FF5722"
@@ -196,7 +196,7 @@
                     android:id="@+id/dob_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@id/user_dob"
+                    android:layout_below="@id/user_birth"
                     android:background="#2E3FA6" />
             </com.google.android.material.textfield.TextInputLayout>
 

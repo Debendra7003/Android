@@ -77,7 +77,6 @@ class HomePage : AppCompatActivity() {
 
                 val json = Gson().toJson(profileData)
                 sendUserId(json, this, userToken)
-                sendLogout(this,userToken)
             } else {
                 Toast.makeText(this, "Token is missing", Toast.LENGTH_SHORT).show()
             }
@@ -116,13 +115,13 @@ class HomePage : AppCompatActivity() {
                     val profileResponse= Gson().fromJson(responseData,ProfileResponse::class.java)
                     val userName=profileResponse.name
                     val dob=profileResponse.birthdate
-                    val number =profileResponse.phone
+                    val number =profileResponse.phone_number
                     val gender = profileResponse.gender
                     val address = profileResponse.address
                     val state= profileResponse.state
                     val pin = profileResponse.pincode
                     val marital_sts = profileResponse.marital_status
-                    storeProfileData(userName,dob,number,gender,address,state,pin,marital_sts)
+                    storeProfileData(userName,number,gender,dob,address,state,pin,marital_sts)
                 }
             //------> Checking the response is successfully received or not !!!!
                 if (response.isSuccessful) {
@@ -189,7 +188,7 @@ class HomePage : AppCompatActivity() {
 
 //For store the UserId
     private data class ProfileData(
-        val id: String
+        val user_id: String
     )
 //    private data class ProfileToken(
 //        val token: String
@@ -200,9 +199,9 @@ private fun storeProfileData(name: String, dob:String, number:String, gender:Str
     val prefs = PreferenceManager.getDefaultSharedPreferences(this)
     val editor = prefs.edit()
     editor.putString("username", name)
-    editor.putString("birthdate", dob)
-    editor.putString("phone", number)
+    editor.putString("phone_number", number)
     editor.putString("gender", gender)
+    editor.putString("birthdate", dob)
     editor.putString("address", address)
     editor.putString("state", state)
     editor.putString("pincode", pin)
@@ -213,9 +212,9 @@ private fun storeProfileData(name: String, dob:String, number:String, gender:Str
 //    For store the the response of all details of profile
    private data class ProfileResponse(
        val name:String,
-       val birthdate:String,
-       val phone:String,
+       val phone_number:String,
        val gender:String,
+       val birthdate:String,
        val state :String,
        val pincode:String,
        val marital_status:String,

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -53,9 +54,9 @@ class HomePage : AppCompatActivity() {
         val token= prefs1.getString("accessToken","")
 
 //--------------> Used for fetch current Location
-        val location = findViewById<ConstraintLayout>(R.id.location)
-        location.setOnClickListener {
-            val intent=Intent(this,MapActivity::class.java)
+        val setting = findViewById<LinearLayout>(R.id.setting)
+        setting.setOnClickListener {
+            val intent=Intent(this,SettingActivity::class.java)
             startActivity(intent)
         }
 
@@ -88,7 +89,7 @@ class HomePage : AppCompatActivity() {
         println("Data from frontend: $json")
         println("Request Headers: $token")
         val client = OkHttpClient()
-        val url = "http://192.168.0.166:8000/api/retrieve-user/" //-------->API url for Data retrieved
+        val url = "http://192.168.0.166:8000/retrieve-user/" //-------->API url for Data retrieved
         val body = RequestBody.create(MediaType.parse("application/json"), json)
         val request = Request.Builder()
             .url(url)
@@ -143,7 +144,7 @@ class HomePage : AppCompatActivity() {
         println("Request Headers: $token")
 
         val client = OkHttpClient()
-        val url = "http://192.168.0.166:8000/api/logout/"
+        val url = "http://192.168.0.166:8000/logout/"
      val non=""
      val body = RequestBody.create(MediaType.parse("application/json"), non)
         val request = Request.Builder()

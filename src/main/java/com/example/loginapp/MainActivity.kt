@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         println("Data from frontend: $json")
 
         val client = OkHttpClient()
-        val url = "http://192.168.0.166:8000/api/login/"
+        val url = "http://192.168.0.166:8000/login/"
         val body = RequestBody.create(MediaType.parse("application/json"), json)
         val request = Request.Builder()
             .url(url)

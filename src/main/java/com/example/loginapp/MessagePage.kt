@@ -167,7 +167,7 @@ class MessagePage : AppCompatActivity() {
         println("token from frontend: $userToken")
 
         val client = OkHttpClient()
-        val url = "http://192.168.0.166:8000/api/update-user/"
+        val url = "http://192.168.0.166:8000/update-user/"
 
         val body = RequestBody.create(MediaType.parse("application/json"), json)
         val request = Request.Builder()

@@ -35,14 +35,14 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-//GO TO REGISTER PAGE
+//----------------> GO TO REGISTER PAGE
         val goRegister =findViewById<TextView>(R.id.signup)
         goRegister.setOnClickListener {
             val intent = Intent(this,RegisterPage::class.java)
             startActivity(intent)
         }
 
-//        FOR LOGIN WORK
+//----------------> FOR LOGIN WORK
         val mail = findViewById<TextInputEditText>(R.id.user_mail)
         val password = findViewById<TextInputEditText>(R.id.password)
         val login =findViewById<Button>(R.id.loginButton)
@@ -67,8 +67,7 @@ class MainActivity : AppCompatActivity() {
         println("Data from frontend: $json")
 
         val client = OkHttpClient()
-        val url = "http://192.168.0.166/myapp/login/"
-
+        val url = "http://192.168.0.166:8000/api/login/"
         val body = RequestBody.create(MediaType.parse("application/json"), json)
         val request = Request.Builder()
             .url(url)
@@ -99,8 +98,11 @@ class MainActivity : AppCompatActivity() {
 
                     val useridResponse= Gson().fromJson(responseData, LoginResponse::class.java)
                     val userId=useridResponse.user_id
-                    val user_token= loginResponse.token
-                    storeUserId(userId,user_token)
+                    val user_token= loginResponse. refresh
+                    val access_token =loginResponse.access
+                    storeUserId(userId,user_token,access_token)
+
+
 
                 }
                 if (response.isSuccessful) {
@@ -126,9 +128,11 @@ class MainActivity : AppCompatActivity() {
 
 // This data class for hold the response of login
     private data class LoginResponse(
-        val token: String,
+        val refresh: String,
+        val access:String,
         val name: String,
-        val user_id:String
+        val user_id:String,
+
     )
     // ----------------> The response data converting JSON to string
     private fun storeUsername(name: String) {
@@ -138,11 +142,13 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun storeUserId(userid: String,user_token:String) {
+    private fun storeUserId(userid: String,user_token:String,access_token: String) {
         val prefs1 = PreferenceManager.getDefaultSharedPreferences(this)
         val editor1 = prefs1.edit()
         editor1.putString("userid", userid)
         editor1.putString("token", user_token)
+        editor1.putString("accessToken", access_token)
         editor1.apply()
     }
+
 }

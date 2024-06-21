@@ -5,14 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.JsonToken
 import android.util.Log
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.gson.Gson
@@ -51,10 +50,22 @@ class HomePage : AppCompatActivity() {
 //      End  -------> This is for name fetch from backend
         val prefs1 = PreferenceManager.getDefaultSharedPreferences(this)
         val userid = prefs1.getString("userid", "")
-        val token= prefs1.getString("token","")
+        val token= prefs1.getString("accessToken","")
 
+//--------------> Used for fetch current Location
+        val location = findViewById<ConstraintLayout>(R.id.location)
+        location.setOnClickListener {
+            val intent=Intent(this,MapActivity::class.java)
+            startActivity(intent)
+        }
 
-        //GO TO MESSAGE PAGE
+//-------------->Calling the logOut function
+        val logOut = findViewById<ImageView>(R.id.imageview11)
+        logOut.setOnClickListener {
+            val userToken = token.toString()
+            sendLogout(this,userToken)
+        }
+//----------------> Calling the profile activity
         val goMessage = findViewById<ImageView>(R.id.imageview12)
         goMessage.setOnClickListener {
             Log.d(userid,"User Id Is $userid")
@@ -65,33 +76,28 @@ class HomePage : AppCompatActivity() {
 
                 val json = Gson().toJson(profileData)
                 sendUserId(json, this, userToken)
+                sendLogout(this,userToken)
             } else {
                 Toast.makeText(this, "Token is missing", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
+//-------------> This Function used to Retrieve the user data from data base and show it in profile page
     private fun sendUserId(json: String, context: Context,token:String) {
         // Print the JSON data before sending it to the backend
         println("Data from frontend: $json")
         println("Request Headers: $token")
-
-
         val client = OkHttpClient()
-        val url = "http://192.168.0.166/myapp/userdata/"
-
+        val url = "http://192.168.0.166:8000/api/retrieve-user/" //-------->API url for Data retrieved
         val body = RequestBody.create(MediaType.parse("application/json"), json)
         val request = Request.Builder()
             .url(url)
             .post(body)
-//            .header("token",token)
-            .addHeader("Authorization", "token $token")
+            .addHeader("Authorization", "Bearer $token")
             .build()
-
 
         println("Request URL: $url")
         println("Request Body: $json")
-
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -99,17 +105,13 @@ class HomePage : AppCompatActivity() {
                     Toast.makeText(context, "User id  not found", Toast.LENGTH_SHORT).show()
                 }
             }
-//--------------> This function will received the response !!!!
+        //--------------> This function will received the response !!!!
             override fun onResponse(call: Call, response: Response) {
                 val responseData = response.body()?.string()
                 println("Response Body: $responseData")//<--------- PRINTING THE RESPONSE
                 runOnUiThread {
                     Toast.makeText(context, responseData, Toast.LENGTH_SHORT).show()
-                    val tokenResponse= Gson().fromJson(responseData, ResponseToken::class.java)
-                    val token=tokenResponse.token
-                    storeToken(token)
-
-// ----------------> Send the response data to the Profile page !!!!
+            // ----------------> Send the response data to the Profile page !!!!
                     val profileResponse= Gson().fromJson(responseData,ProfileResponse::class.java)
                     val userName=profileResponse.name
                     val dob=profileResponse.birthdate
@@ -120,9 +122,8 @@ class HomePage : AppCompatActivity() {
                     val pin = profileResponse.pincode
                     val marital_sts = profileResponse.marital_status
                     storeProfileData(userName,dob,number,gender,address,state,pin,marital_sts)
-
                 }
-//--------------> Checking the response is successfully received or not !!!!
+            //------> Checking the response is successfully received or not !!!!
                 if (response.isSuccessful) {
                     runOnUiThread {
                         Toast.makeText(context, "User Id Get ", Toast.LENGTH_SHORT).show()
@@ -137,15 +138,61 @@ class HomePage : AppCompatActivity() {
             }
         })
     }
+//-------------> This Function used to logout the application
+    private fun sendLogout( context: Context,token:String) {
+        println("Request Headers: $token")
 
+        val client = OkHttpClient()
+        val url = "http://192.168.0.166:8000/api/logout/"
+     val non=""
+     val body = RequestBody.create(MediaType.parse("application/json"), non)
+        val request = Request.Builder()
+            .url(url)
+            .post(body)
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+
+        println("Request URL: $url")
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(context, "Logout Failed !!!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            //--------------> This function will received the response !!!!
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body()?.string()
+                println("Response Body: $responseData")//<--------- PRINTING THE RESPONSE
+                runOnUiThread {
+                    Toast.makeText(context, responseData, Toast.LENGTH_SHORT).show()
+                }
+//--------------> Checking the response is successfully received or not !!!!
+                if (response.isSuccessful) {
+                    runOnUiThread {
+                        Toast.makeText(context, "Logout Successful ", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@HomePage, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        finish()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(context, "Logout Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
 
 //For store the UserId
     private data class ProfileData(
         val id: String
     )
-    private data class ProfileToken(
-        val token: String
-    )
+//    private data class ProfileToken(
+//        val token: String
+//    )
 
 //    send the response data to profile page
 private fun storeProfileData(name: String, dob:String, number:String, gender:String, address:String,state:String, pin:String, marital_sts:String) {
@@ -173,14 +220,9 @@ private fun storeProfileData(name: String, dob:String, number:String, gender:Str
        val marital_status:String,
        val address:String
    )
-    private data class ResponseToken(
-        val token: String
-    )
+//    private data class ResponseToken(
+//        val token: String
+//    )
 
-    private fun storeToken(token: String) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = prefs.edit()
-        editor.putString("token", token)
-        editor.apply()
-    }
+
 }

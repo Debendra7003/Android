@@ -25,7 +25,7 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     //@SuppressLint("MissingInflatedId")
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -35,12 +35,20 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
 //----------------> GO TO REGISTER PAGE
         val goRegister =findViewById<TextView>(R.id.signup)
         goRegister.setOnClickListener {
             val intent = Intent(this,RegisterPage::class.java)
             startActivity(intent)
         }
+
+//----------------> Go to Forgot Password Page
+        val goForgotPassword =findViewById<TextView>(R.id.forgotText)
+            goForgotPassword.setOnClickListener {
+                val goForgot = Intent(this,ForgotPassword::class.java)
+                startActivity(goForgot)
+            }
 
 //----------------> FOR LOGIN WORK
         val mail = findViewById<TextInputEditText>(R.id.user_mail)

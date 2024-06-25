@@ -195,7 +195,7 @@ class HomePage : AppCompatActivity() {
 //    )
 
 //    send the response data to profile page
-private fun storeProfileData(name: String, dob:String, number:String, gender:String, address:String,state:String, pin:String, marital_sts:String) {
+private fun storeProfileData(name: String, number:String, gender:String, dob:String, address:String,state:String, pin:String, marital_sts:String) {
     val prefs = PreferenceManager.getDefaultSharedPreferences(this)
     val editor = prefs.edit()
     editor.putString("username", name)
